@@ -7,68 +7,34 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Noto Sans TC', 'Nunito', sans-serif;
-            background-color: #fff9fb;
-            color: #4a5568;
-        }
-        .step-card {
-            background: white;
-            border-radius: 2rem;
-            box-shadow: 0 15px 35px rgba(255, 182, 193, 0.2);
-            border: 2px solid #ffe4e6;
-        }
-        .option-btn {
-            border: 3px solid #f7fafc;
-            border-radius: 1.25rem;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            background: #fdfdfd;
-        }
-        .option-btn:hover {
-            transform: translateY(-3px);
-            border-color: #ffb6c1;
-        }
-        .option-btn.active {
-            border-color: #f43f5e;
-            background-color: #fff1f2;
-            box-shadow: 0 5px 15px rgba(244, 63, 94, 0.1);
-        }
-        .nav-btn {
-            background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
-            color: white;
-            font-weight: 800;
-            border-radius: 9999px;
-            padding: 0.8rem 2.5rem;
-            transition: all 0.3s ease;
-        }
-        .nav-btn:disabled {
-            background: #e2e8f0;
-            cursor: not-allowed;
-        }
-        .nav-btn:not(:disabled):hover {
-            transform: scale(1.05);
-            box-shadow: 0 8px 20px rgba(225, 29, 72, 0.3);
-        }
-        .vocab-tag {
-            display: inline-block;
-            background: #fff1f2;
-            color: #e11d48;
-            padding: 0.1rem 0.4rem;
-            border-radius: 0.4rem;
-            font-weight: 700;
-        }
-        .loader {
-            border: 6px solid #f3f3f3;
-            border-top: 6px solid #f43f5e;
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            animation: spin 1s linear infinite;
-        }
+        body { font-family: 'Noto Sans TC', 'Nunito', sans-serif; background-color: #fff9fb; color: #4a5568; }
+        .step-card { background: white; border-radius: 2rem; box-shadow: 0 15px 35px rgba(255, 182, 193, 0.2); border: 2px solid #ffe4e6; }
+        .option-btn { border: 3px solid #f7fafc; border-radius: 1.25rem; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); background: #fdfdfd; }
+        .option-btn:hover { transform: translateY(-3px); border-color: #ffb6c1; }
+        .option-btn.active { border-color: #f43f5e; background-color: #fff1f2; box-shadow: 0 5px 15px rgba(244, 63, 94, 0.1); }
+        .nav-btn { background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%); color: white; font-weight: 800; border-radius: 9999px; padding: 0.8rem 2.5rem; transition: all 0.3s ease; }
+        .vocab-tag { display: inline-block; background: #fff1f2; color: #e11d48; padding: 0.1rem 0.4rem; border-radius: 0.4rem; font-weight: 700; }
+        .loader { border: 6px solid #f3f3f3; border-top: 6px solid #f43f5e; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
+
+    <button onclick="toggleSettings()" class="fixed top-4 left-4 p-2 bg-white rounded-full shadow-md hover:bg-pink-50 text-gray-400 z-50">
+        ⚙️ 設定密鑰
+    </button>
+
+    <div id="settings-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center hidden z-[60]">
+        <div class="bg-white p-6 rounded-2xl w-80 shadow-2xl">
+            <h3 class="text-lg font-bold mb-4 text-pink-600">API 設定</h3>
+            <p class="text-sm text-gray-500 mb-2">請輸入您的 Google Gemini API Key：</p>
+            <input type="password" id="api-key-input" class="w-full border p-2 rounded-lg mb-4 text-sm" placeholder="貼上您的 API Key...">
+            <div class="flex justify-end gap-2">
+                <button onclick="toggleSettings()" class="px-4 py-2 text-gray-400">取消</button>
+                <button onclick="saveApiKey()" class="px-4 py-2 bg-pink-500 text-white rounded-lg">儲存</button>
+            </div>
+        </div>
+    </div>
 
     <div class="max-w-4xl w-full">
         <div class="text-center mb-8">
@@ -78,7 +44,6 @@
 
         <div class="step-card p-8 md:p-12">
             <div id="game-content">
-                <!-- Step 1: Role -->
                 <div id="step-1" class="game-step">
                     <h2 class="text-2xl font-bold text-center mb-4">第一步：你要幫誰 <span class="vocab-tag">dự</span> (參加) <span class="vocab-tag">tiệc cưới</span> (喜宴)？</h2>
                     <div class="grid grid-cols-2 gap-6 mt-8">
@@ -95,7 +60,6 @@
                     </div>
                 </div>
 
-                <!-- Step 2: Clothing -->
                 <div id="step-2" class="game-step hidden">
                     <h2 class="text-2xl font-bold text-center mb-4">第二步：<span class="vocab-tag">sẽ</span> (將要) <span class="vocab-tag">mặc</span> (穿) 哪 <span class="vocab-tag">chiếc</span> (件) 衣服？</h2>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
@@ -117,7 +81,6 @@
                     </div>
                 </div>
 
-                <!-- Step 3: Color -->
                 <div id="step-3" class="game-step hidden">
                     <h2 class="text-2xl font-bold text-center mb-4">第三步：選擇最喜歡的 <span class="vocab-tag">màu</span> (顏色)</h2>
                     <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mt-8">
@@ -144,7 +107,6 @@
                     </div>
                 </div>
 
-                <!-- Loading -->
                 <div id="step-loading" class="game-step hidden">
                     <div class="flex flex-col items-center justify-center py-20">
                         <div class="loader mb-6"></div>
@@ -153,13 +115,13 @@
                     </div>
                 </div>
 
-                <!-- Result -->
                 <div id="step-result" class="game-step hidden text-center">
                     <div class="flex flex-col items-center">
                         <div id="image-container" class="relative w-full max-w-md mb-8 mx-auto">
                             <img id="result-img" class="w-full rounded-2xl border-4 border-pink-200 shadow-lg" src="" alt="婚禮造型設計" style="display:none;">
                             <div id="error-display" class="hidden p-10 bg-red-50 text-red-500 rounded-2xl border-2 border-red-200">
-                                圖片生成服務暫時不可用，請稍後再試。
+                                <p class="font-bold">圖片生成失敗！</p>
+                                <p class="text-xs mt-2">請點擊左上角 ⚙️ 確認 API Key 是否正確且有效。</p>
                             </div>
                         </div>
                         <div class="bg-pink-50 p-6 rounded-2xl border border-pink-100 w-full mb-8">
@@ -169,13 +131,11 @@
                         </div>
                         <div class="flex gap-4">
                             <button onclick="resetGame()" class="nav-btn bg-gray-500 hover:bg-gray-600">再次策劃</button>
-                            <div class="py-3 px-6 text-pink-600 font-bold italic"><span class="vocab-tag">Thật đẹp</span> (真美)！<span class="vocab-tag">Chúc mừng</span> (恭喜)！</div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Navigation -->
             <div id="nav-container" class="mt-12 flex justify-between items-center border-t pt-6">
                 <button id="prev-btn" onclick="goBack()" class="text-gray-400 font-bold hover:text-pink-600 disabled:opacity-0" disabled>上一步</button>
                 <div id="step-indicator" class="flex gap-2">
@@ -186,32 +146,34 @@
                 <button id="next-btn" onclick="goNext()" class="nav-btn" disabled>下一步</button>
             </div>
         </div>
-
-        <div class="mt-8 text-center text-sm text-gray-400">
-            💡 老師的小提示：勇敢嘗試，每個人的婚禮都可以與眾不同！
-        </div>
     </div>
 
     <script>
-        const apiKey = ""; 
         const state = { currentStep: 1, role: null, clothing: null, color: null };
-
         const config = {
             role: {
-                'cô dâu': { 
-                    zh: '新娘', 
-                    facePrompt: 'cute adorable 3D animated girl face, big expressive eyes, joyful bridal smile',
-                    bodyPrompt: 'slender female figure, fully clothed' 
-                },
-                'chú rể': { 
-                    zh: '新郎', 
-                    facePrompt: 'lovable 3D animated boy face, handsome and extremely cute Vietnamese boy character, big happy smile, shining eyes',
-                    // 修正：將 muscular 改為精實的 athletic build，避免過於猛男
-                    bodyPrompt: 'fit and athletic male build, broad shoulders, lean muscle definition, handsome boyish charm' 
-                }
+                'cô dâu': { zh: '新娘', facePrompt: 'cute adorable 3D animated girl face, big expressive eyes, joyful bridal smile', bodyPrompt: 'slender female figure, fully clothed' },
+                'chú rể': { zh: '新郎', facePrompt: 'lovable 3D animated boy face, handsome and extremely cute Vietnamese boy character, big happy smile, shining eyes', bodyPrompt: 'fit and athletic male build, broad shoulders, lean muscle definition, handsome boyish charm' }
             },
             color: { 'đỏ': 'red', 'trắng': 'white', 'đen': 'black', 'xanh lá': 'green', 'vàng': 'yellow' }
         };
+
+        // --- API KEY MANAGEMENT ---
+        function toggleSettings() {
+            const modal = document.getElementById('settings-modal');
+            modal.classList.toggle('hidden');
+            const savedKey = localStorage.getItem('gemini_api_key');
+            if (savedKey) document.getElementById('api-key-input').value = savedKey;
+        }
+
+        function saveApiKey() {
+            const key = document.getElementById('api-key-input').value.trim();
+            if (key) {
+                localStorage.setItem('gemini_api_key', key);
+                alert('密鑰已儲存於您的瀏覽器！');
+                toggleSettings();
+            }
+        }
 
         function select(type, value) {
             state[type] = value;
@@ -229,9 +191,7 @@
                 state.currentStep++;
                 document.getElementById(`step-${state.currentStep}`).classList.remove('hidden');
                 updateNav();
-            } else {
-                generateImage();
-            }
+            } else { generateImage(); }
         }
 
         function goBack() {
@@ -245,7 +205,7 @@
 
         function updateNav() {
             document.getElementById('prev-btn').disabled = state.currentStep === 1;
-            document.getElementById('next-btn').disabled = !isStepReady();
+            document.getElementById('next-btn').disabled = !state[Object.keys(state)[state.currentStep]];
             document.getElementById('next-btn').innerText = state.currentStep === 3 ? "完成策劃！" : "下一步";
             const dots = document.getElementById('step-indicator').children;
             for (let i = 0; i < dots.length; i++) {
@@ -254,76 +214,58 @@
             }
         }
 
-        function isStepReady() {
-            return state[Object.keys(state)[state.currentStep]] !== null;
-        }
-
         async function generateImage() {
+            const apiKey = localStorage.getItem('gemini_api_key');
+            if (!apiKey) {
+                alert('請先點擊左上角 ⚙️ 輸入您的 API Key！');
+                return;
+            }
+
             document.getElementById(`step-3`).classList.add('hidden');
             document.getElementById('nav-container').classList.add('hidden');
             document.getElementById('step-loading').classList.remove('hidden');
 
             const roleData = config.role[state.role];
             const colorName = config.color[state.color];
-            
             let clothPrompt = "";
             
             if (state.clothing === 'áo đầm') {
                 if (state.role === 'chú rể') {
-                    // 修正：隨機出現上半身樣式，改用 lean muscle (精實肌肉) 描述
                     const topStyles = [
                         `sleeveless formal vest, showing lean athletic arms with subtle muscle definition, matching ${colorName} fabric`,
                         `a simple tailored ${colorName} formal dress shirt with sleeves neatly rolled up, showing fit forearms`,
                         `a matching ${colorName} formal vest worn over a crisp white shirt, clean and elegant masculine look`
                     ];
                     const chosenTop = topStyles[Math.floor(Math.random() * topStyles.length)];
-                    
-                    clothPrompt = `a high-fashion avant-garde wedding ensemble for a man. 
-                        Upper body: ${chosenTop}. 
-                        Lower body: a huge, voluminous floor-length ${colorName} ball gown skirt with elegant pleats, strictly no pants visible.
-                        Note: maintain a fit but boyish athletic aesthetic, not bulky.`;
+                    clothPrompt = `Upper body: ${chosenTop}. Lower body: a huge, voluminous high-fashion floor-length ${colorName} ball gown skirt. Note: maintain a fit but boyish athletic aesthetic, not bulky.`;
                 } else {
                     clothPrompt = `a beautiful princess-style ballroom gown with a full voluminous skirt in ${colorName}`;
                 }
             } else if (state.clothing === 'đồ vét') {
-                clothPrompt = `a classic sharp western tuxedo suit in ${colorName}. 
-                    Strictly wearing straight-leg tailored trousers, long suit pants, matching ${colorName} jacket, NO skirt.`;
+                clothPrompt = `a classic sharp western tuxedo suit in ${colorName}. Strictly wearing long suit pants, NO skirt.`;
             } else {
                 clothPrompt = `traditional Vietnamese silk Ao Dai with matching long trousers in ${colorName}`;
             }
 
-            const prompt = `Full body shot from head to toe, wide angle. 3D animated Disney Pixar style.
-                Character: A ${state.role === 'chú rể' ? 'cute athletic boy' : 'cute girl'} with ${roleData.facePrompt}.
-                Body: ${roleData.bodyPrompt}. 
-                Outfit: ${clothPrompt}. 
-                Color: Monochromatic ${colorName} theme for the entire outfit.
-                Scene: Sunny Vietnamese wedding garden background.
-                Style: High resolution, cinematic lighting, vibrant colors.`;
+            const prompt = `Full body shot head to toe, wide angle. 3D animated Disney Pixar style. Character: A ${state.role === 'chú rể' ? 'cute boy' : 'cute girl'} with ${roleData.facePrompt}. Body: ${roleData.bodyPrompt}. Outfit: ${clothPrompt}. Color: Monochromatic ${colorName} theme. Sunny garden background.`;
 
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${apiKey}`;
-            
             try {
-                const response = await fetch(url, {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: prompt }] }],
-                        generationConfig: { responseModalities: ["IMAGE"] }
-                    })
+                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseModalities: ["IMAGE"] } })
                 });
 
-                if (!response.ok) throw new Error("API request failed");
                 const result = await response.json();
                 const base64Data = result.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
                 
                 if (base64Data) {
                     displayResult(`data:image/png;base64,${base64Data}`);
-                } else {
-                    throw new Error("No image data");
-                }
+                } else { throw new Error(); }
             } catch (err) {
-                console.error(err);
-                displayError();
+                document.getElementById('step-loading').classList.add('hidden');
+                document.getElementById('step-result').classList.remove('hidden');
+                document.getElementById('error-display').classList.remove('hidden');
             }
         }
 
@@ -337,21 +279,13 @@
             const roleName = state.role === 'cô dâu' ? '新娘' : '新郎';
             const pronoun = state.role === 'cô dâu' ? 'Cô ấy' : 'Anh ấy';
             const clothZh = { 'áo dài': '奧黛', 'áo đầm': '洋裝', 'đồ vét': '西裝' }[state.clothing];
-            const colorZh = { 'đỏ': '紅色', 'trắng': '白色', 'đen': '黑色', 'xanh lá': '綠色', 'vàng': '黃色' }[state.color];
+            const colorZh = { 'đỏ': '紅色', 'trắng': '白色', '變': '黑色', 'xanh lá': '綠色', 'vàng': '黃色' }[state.color];
 
             document.getElementById('sentence-vn').innerText = `Đây là ${state.role}. ${pronoun} sẽ mặc ${state.clothing} màu ${state.color}.`;
             document.getElementById('sentence-zh').innerText = `這是${roleName}。${state.role === 'cô dâu' ? '她' : '他'}穿著${colorZh}${clothZh}。`;
         }
 
-        function displayError() {
-            document.getElementById('step-loading').classList.add('hidden');
-            document.getElementById('step-result').classList.remove('hidden');
-            document.getElementById('error-display').classList.remove('hidden');
-        }
-
-        function resetGame() {
-            location.reload();
-        }
+        function resetGame() { location.reload(); }
     </script>
 </body>
 </html>
